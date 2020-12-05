@@ -351,6 +351,7 @@ class Mutation:
 
         return T
 
+
 # This is cross-over process
 class CrossOver:
     def crossover(self, chrome, mutated):
@@ -362,6 +363,7 @@ class CrossOver:
             else:
                 crossover_choromosome += chrome[i]
         return crossover_choromosome
+
 
 # This is selection process between two chromosome
 class Selection:
@@ -407,6 +409,7 @@ class Selection:
         else:
             return offstring
 
+
 # This is SL-GEP which combines all processes
 class SL_GEP:
     def __init__(self, NP=50, h=10, h1=3, k=2):
@@ -444,7 +447,7 @@ class SL_GEP:
             if fitness[i] < perfect_hit:
                 break
         if fitness[i] < perfect_hit:
-            print('Result solve and equation is: ',pop[i])
+            print('Result solve and equation is:', pop[i])
             return pop[i], 0, 0
 
         best_ind = fitness.index(min(fitness))
@@ -457,15 +460,21 @@ class SL_GEP:
 
 
 if __name__ == '__main__':
-    pop = Population().init_population()
-
-    pop, fitness_history_mean, fitness_history_max = SL_GEP().main_program()
-    plt.plot(list(range(NG)), fitness_history_mean, label='Mean Fitness')
-    plt.plot(list(range(NG)), fitness_history_max, label='Max Fitness')
-    plt.legend()
-    plt.axis((0, 200, 0, 1))
-    plt.title('Fitness through the generations')
-    plt.xlabel('Generations')
-    plt.ylabel('Fitness')
-    plt.savefig('report.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    i = 0
+    suc = 0
+    while i < NR:
+        pop = Population().init_population()
+        pop, fitness_history_mean, fitness_history_max = SL_GEP().main_program()
+        plt.plot(list(range(NG)), fitness_history_mean, label='Mean Fitness')
+        plt.plot(list(range(NG)), fitness_history_max, label='Max Fitness')
+        plt.legend()
+        plt.axis((0, 200, 0, 1))
+        plt.title('Fitness through the generations')
+        plt.xlabel('Generations')
+        plt.ylabel('Fitness')
+        plt.savefig('report.png', dpi=300, bbox_inches='tight')
+        plt.show()
+        if len(pop) == 1:
+            suc += 1
+            break
+    print(suc)
