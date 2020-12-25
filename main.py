@@ -18,7 +18,7 @@ from statistics import mean
 import matplotlib.pyplot as plt
 
 NR = 100  # Number of run
-NG = 200  # Number of generation
+NG = 2000  # Number of generation
 
 
 # Defining some constant of evolution operator
@@ -62,8 +62,8 @@ def training_create(target_function, NT=200, t=(-1, 1)):
     input = np.random.uniform(start, end, (NT, 2))
     x = input[:, 0].reshape((-1, 1))
     y = input[:, 1].reshape((-1, 1))
-    reslut = target_function(x, y)
-    return np.concatenate((input, reslut), axis=1)
+    result = target_function(x, y)
+    return np.concatenate((input, result), axis=1)
 
 
 # This class refer to a node of expression tree
@@ -137,6 +137,7 @@ class Population:
                 alen_dict[a] += 1
 
         return alen_dict
+
 
 # This class contains some functions to build, evaluate a tree from chromosome
 # First, constructor function receives a chromosome as string for argument
@@ -247,6 +248,7 @@ class Evaluate:
         except Exception as error:
             return 500  # A large float number
 
+
 # This class is refer to process to mutate a chromosome
 # There are much of sub-function of this program so I won't list
 # all of them. There two important function
@@ -309,7 +311,7 @@ class Mutation:
 
         return key[i]
 
-    def mutated(self, chromosome, target_chromosome):
+    def mutated(self, base,  chromosome, target_chromosome):
         F = random.random()
         l = 2 * H + 1 + K * (2 * H1 + 1)
         phi = 18 / 21
@@ -330,26 +332,26 @@ class Mutation:
         mutated = ''
         for i in range(l):
             if dis_vector[i] == 0:
-                mutated += chromosome[i]
+                mutated += base[i]
             if dis_vector[i] == 1:
                 if random.random() < F:
                     mutated_ele = self.frequency_base_assignment(chromosome[i],\
                                                                  i, phi)
                     mutated += mutated_ele
                 else:
-                    mutated += chromosome[i]
+                    mutated += base[i]
 
         return mutated
 
     def de_mutated(self, chrome, best):
         # This is first step of DE /Current-to-best/
-        T = self.mutated(chrome, best)
-        #
-        # # This is second step of DE /Current-to-best/
-        # r2 = random.randint(0, len(self.population))
-        # Y = self.mutated(T, self.population[r2])
+        T = self.mutated(chrome, chrome, best)
 
-        return T
+        # This is second step of DE /Current-to-best/
+        r1, r2 = random.choices(self.population, weights=None, cum_weights=None, k=2)
+        Y = self.mutated(T, r1, r2)
+
+        return Y
 
 
 # This is cross-over process
@@ -428,8 +430,6 @@ class SL_GEP:
         fitness_history_mean = []
 
         while (gen < NG):
-            if (len(pop) == 1):
-                break
             pop, means, best = self.proposed_algorithm(pop, train)
             gen += 1
             print('Gen {} has {} best RMSE is {}'.format(gen, means, best))
@@ -437,7 +437,10 @@ class SL_GEP:
             fitness_history_max.append(best)
             fitness_history_mean.append(means)
 
-        return pop, fitness_history_mean, fitness_history_max
+            if (len(pop) == 1):
+                break
+
+        return pop, fitness_history_mean, fitness_history_max, gen
 
     def proposed_algorithm(self, pop, train):
 
@@ -448,7 +451,7 @@ class SL_GEP:
                 break
         if fitness[i] < perfect_hit:
             print('Result solve and equation is:', pop[i])
-            return pop[i], 0, 0
+            return [pop[i]], 0, 0
 
         best_ind = fitness.index(min(fitness))
         for i in range (len(pop)):
@@ -464,17 +467,16 @@ if __name__ == '__main__':
     suc = 0
     while i < NR:
         pop = Population().init_population()
-        pop, fitness_history_mean, fitness_history_max = SL_GEP().main_program()
-        plt.plot(list(range(NG)), fitness_history_mean, label='Mean Fitness')
-        plt.plot(list(range(NG)), fitness_history_max, label='Max Fitness')
+        pop, fitness_history_mean, fitness_history_max, gen = SL_GEP().main_program()
+        plt.plot(list(range(len(fitness_history_mean))), fitness_history_mean, label='Mean Fitness')
+        plt.plot(list(range(len(fitness_history_max))), fitness_history_max, label='Best Fitness')
         plt.legend()
-        plt.axis((0, 200, 0, 1))
+        plt.axis((0, gen + 100, 0, 1))
         plt.title('Fitness through the generations')
         plt.xlabel('Generations')
         plt.ylabel('Fitness')
-        plt.savefig('report.png', dpi=300, bbox_inches='tight')
+        plt.savefig('report' + str(i) + '.png', dpi=300, bbox_inches='tight')
         plt.show()
-        if len(pop) == 1:
+        if gen < NG:
             suc += 1
-            break
     print(suc)
