@@ -479,4 +479,4 @@ if __name__ == '__main__':
         plt.show()
         if gen < NG:
             suc += 1
-    print("The percentage of reach perfect hit:",suc)
+    print("The percentage of reach perfect hit:", suc)
