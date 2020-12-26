@@ -421,7 +421,7 @@ class SL_GEP:
         self.k = k
 
     def main_program(self):
-        target_func = lambda x, y: np.sin(x) + np.sin(x*x + x)
+        target_func = lambda x, y: x**4 + x**3 + x**2 + x
         train = training_create(target_func, 200, (-1, 1))
 
         pop = Population().init_population()
@@ -463,9 +463,9 @@ class SL_GEP:
 
 
 if __name__ == '__main__':
-    i = 0
+    i = 1
     suc = 0
-    while i < NR:
+    while i <= NR:
         pop = Population().init_population()
         pop, fitness_history_mean, fitness_history_max, gen = SL_GEP().main_program()
         plt.plot(list(range(len(fitness_history_mean))), fitness_history_mean, label='Mean Fitness')
@@ -477,6 +477,9 @@ if __name__ == '__main__':
         plt.ylabel('Fitness')
         plt.savefig('report' + str(i) + '.png', dpi=300, bbox_inches='tight')
         plt.show()
+
+        # Next gen please and more
+        i += 1
         if gen < NG:
             suc += 1
     print("The percentage of reach perfect hit:", suc)
