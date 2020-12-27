@@ -12,8 +12,6 @@
 
 # Import some package into this program
 import math
-from typing import List
-
 import numpy as np
 import random
 from statistics import mean
