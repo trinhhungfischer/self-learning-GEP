@@ -12,6 +12,8 @@
 
 # Import some package into this program
 import math
+from typing import List
+
 import numpy as np
 import random
 from statistics import mean
@@ -26,14 +28,14 @@ NP = 50  # Number of individuals in first initial population
 K = 2  # Number of ADFs in one chromosome
 H = 10  # Number of head elements in each main genome
 H1 = 3  # Number of head elements in each ADFs
-perfect_hit = 0.0001  # The RMSE will converge if it is less than perfect hit
+PERFECT_HIT = 0.0001  # The RMSE will converge if it is less than perfect hit
 
 
 # All kind of node in this program
-adf_set = list(map(str, range(K)))
-func_set = list('+-*/QEs')
-ter_set = ['x', 'y']
-input_arg = ['a', 'b']
+ADF_SET = list(map(str, range(K)))
+FUNC_SET = list('+-*/QEs')
+TER_SET = ['x', 'y']
+INPUT_ARG = ['a', 'b']
 
 
 # This function return the number of maximum child of a function node
@@ -48,8 +50,8 @@ def is_operator(c=''):
     if c == 's' or c == 'E' or c == 'Q':
         return 1, 1
     try:
-        if adf_set.index(c) + 1:
-            return 2, 2, adf_set.index(c)
+        if ADF_SET.index(c) + 1:
+            return 2, 2, ADF_SET.index(c)
     except Exception as error:
         return 0, 0
 
@@ -94,11 +96,11 @@ class Population:
     def init_adf(self, h1=3):
         str = []
         for i in range(h1):
-            ele = random.choice(func_set)
+            ele = random.choice(FUNC_SET)
             str.append(ele)
 
         for i in range(h1 + 1):
-            ele = random.choice(input_arg)
+            ele = random.choice(INPUT_ARG)
             str.append(ele)
 
         return ''.join(str)
@@ -106,10 +108,10 @@ class Population:
     def init_main(self, h=10):
         str = []
         for i in range(h):
-            ele = random.choice(func_set + ter_set + adf_set)
+            ele = random.choice(FUNC_SET + TER_SET + ADF_SET)
             str.append(ele)
         for i in range(h + 1):
-            ele = random.choice(ter_set)
+            ele = random.choice(TER_SET)
             str.append(ele)
         return ''.join(str)
 
@@ -129,7 +131,7 @@ class Population:
 
     def alen_set(self, population):
         alen_dict = {}
-        all_alen = adf_set + func_set + ter_set + input_arg
+        all_alen = ADF_SET + FUNC_SET + TER_SET + INPUT_ARG
         for alen in all_alen:
             alen_dict[alen] = 0
         for individual in population:
@@ -220,10 +222,10 @@ class Evaluate:
                 return math.exp(self.calculate(x0, value_set))
         if tree.maxchild == 0:
             try:
-                t = ter_set.index(tree.data)
+                t = TER_SET.index(tree.data)
                 return float(value_set[t])
             except:
-                t = input_arg.index(tree.data)
+                t = INPUT_ARG.index(tree.data)
                 return float(value_set[t])
 
     def calcualte_chromosome(self, value_set):
@@ -265,11 +267,11 @@ class Mutation:
 
         if pos < H:
             if random.random() < phi:
-                feasible_set = func_set + adf_set
+                feasible_set = FUNC_SET + ADF_SET
             else:
-                feasible_set = ter_set
+                feasible_set = TER_SET
         if (pos >= H) and (pos < 2 * H + 1):
-            feasible_set = ter_set
+            feasible_set = TER_SET
 
         for k in range(K):
             # This is refer to element which be located in
@@ -279,13 +281,13 @@ class Mutation:
                 # Element type is random between function and input argument
                 ele_type = random.randint(0, 1)
                 if ele_type == 0:
-                    return random.choice(func_set)
+                    return random.choice(FUNC_SET)
                 else:
-                    return random.choice(input_arg)
+                    return random.choice(INPUT_ARG)
             else:
                 if (pos >= 2 * H + 1 + k * (2 * H1 + 1) + H1) and \
                         (pos < 2 * H + 1 + (k + 1) * (2 * H1 + 1)):
-                    return random.choice(input_arg)
+                    return random.choice(INPUT_ARG)
 
         # This part is roulette wheel to mutate this element
         # First we calculate the probability of alen a can be chosen by
@@ -447,9 +449,9 @@ class SL_GEP:
         fitness = []
         for i in range (len(pop)):
             fitness.append(Evaluate(pop[i]).RMSE(train))
-            if fitness[i] < perfect_hit:
+            if fitness[i] < PERFECT_HIT:
                 break
-        if fitness[i] < perfect_hit:
+        if fitness[i] < PERFECT_HIT:
             print('Result solve and equation is:', pop[i])
             return [pop[i]], 0, 0
 
