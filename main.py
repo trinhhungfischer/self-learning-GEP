@@ -478,7 +478,7 @@ if __name__ == '__main__':
         plt.savefig('report' + str(i) + '.png', dpi=300, bbox_inches='tight')
         plt.show()
 
-        # Next gen please and more
+        # Next run please and more
         i += 1
         if gen < NG:
             suc += 1
